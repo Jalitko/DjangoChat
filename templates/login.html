@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    {% load static %}
+    <title>Login • DjangoChat</title>
+    <link rel="shortcut icon" href="{%  static 'icon.svg' %}">
+    <link rel="stylesheet" href="{%  static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{%  static 'js/main.js' %}"></script> 
+  </head>
+  <body>
+
+    <div class='container'>
+      
+      <div class='logodiv'>
+        <img src ="{%  static 'icon.svg' %}" class='logo'/>
+        <a class='logotext'>DjangoChat</a>
+      </div>
+
+        <form class='loginForm' name="LoginForm" method="post">
+          {% csrf_token %}
+          <label for="email">Email</label>
+          <input type="text" placeholder="Email" name="email" id="email" class='login-singup-input' autocomplete="off" maxlength="150" required="">
+          
+          <label for="password">Password</label>
+          <input type="password" placeholder="Password" name="password" id="password" class='login-singup-input' maxlength="150" required="">
+          
+          <button type='button' class="showpsd" onclick='TogglePassword()'><i id='toggleeye' class="fa fa-eye"></i></button>
+
+          {% if error %}
+          <a class="error">{{ error }}</a>
+          <button class="login-btn" style='margin-top:35px;'>Log In</button>
+          
+          {% else %}
+          <button class="login-btn">Log In</button>
+          
+          {% endif %}
+          
+          <a type='button' class='signup-btn' href="{% url 'signup_view' %}">New User? Sign Up</a>
+        </form>
+    
+    </div>
+    
+  </body>
+</html>
+

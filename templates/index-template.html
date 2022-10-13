@@ -1,0 +1,316 @@
+<!doctype html>
+<html>
+  <head>
+    {% load static %}
+    <title>DjangoChat</title>
+    <link rel="shortcut icon" href="{%  static 'icon.svg' %}">
+    <link rel="stylesheet" href="{%  static 'css/style.css' %}">
+    <script src="{%  static 'js/main.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+     
+  </head>
+  <body>
+
+    <img class="profile-picture main-profile" src="https://i2-prod.walesonline.co.uk/news/uk-news/article23927263.ece/ALTERNATES/s1200c/0_F038F02A-D11F-11EC-A042-0A2111BCB09D.jpg" />
+    <span class="messages">Messages</span>
+    
+    <img class="profile-picture active-profile" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+    <span class="active-name">Milan Aladin</span>
+    
+
+
+    <div class="chats-container">
+
+      <img src="{%  static 'arrow.svg' %}" id="slideLeft"  class="arrow arrow-left"  draggable="false" onclick='Hscroll("left")'>
+      <img src="{%  static 'arrow.svg' %}" id="slideRight" class="arrow arrow-right" draggable="false" onclick='Hscroll("right")'>
+
+      <div class='online-users' id='online-users-bar'>
+
+
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          <span class="profile-name">Milan Aladin</span>
+        </div class='online-user'>
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://whatifgaming.com/wp-content/uploads/2021/10/GDQb2pQU.jpg" />
+          <span class="profile-name">Cherise Wtnhetnaio</span>
+        </div class='online-user'>
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://whatifgaming.com/wp-content/uploads/2021/10/2avt5n-RspEf-256s.png" />
+          <span class="profile-name">Sue Barker</span>
+        </div class='online-user'>
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://whatifgaming.com/wp-content/uploads/2021/10/6b2f7340dc25caa781235a8a959d39564e441618_hq.jpg" />
+          <span class="profile-name">Autumn W..</span>
+        </div class='online-user'>
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://media.discordapp.net/attachments/790822017523253288/1022201830576504953/unknown.png" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'>
+        
+        
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://whatifgaming.com/wp-content/uploads/2021/10/6b2f7340dc25caa781235a8a959d39564e441618_hq.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'>
+
+
+        <div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'><div class='online-user'>
+          <img class="profile-picture profile-inchats" src="https://i.pinimg.com/564x/36/51/6d/36516d2965ed716b6061e303a3f5a35c.jpg" />
+          <span class="profile-name">Jac Schro..</span>
+        </div class='online-user'>
+      
+      
+      
+      
+      
+      </div>
+    
+      <div class='line line1'></div>
+
+      <div class='recents scroller'>
+        
+        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>
+
+        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 2</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>
+
+
+        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 3</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>
+
+        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 4</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 5</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://resizing.flixster.com/jGSTOb1_vz0q_RrQ4jalU7ffcvg=/300x300/v2/https://flxt.tmsimg.com/assets/p12607923_i_h6_aa.jpg" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 6</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">7:27</span>
+
+            <div class="unread-circle">
+              <span>5</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://media.discordapp.net/attachments/790822017523253288/1022201830576504953/unknown.png" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 7</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">4:20</span>
+
+            <div class="unread-circle">
+              <span>9+</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>
+        <div class='recent'>
+          <img class="profile-picture profile-recent" src="https://media.discordapp.net/attachments/790822017523253288/1022201830576504953/unknown.png" />
+          
+          <div style='width:85%;'> 
+            <span class="profile-name-recent">Milan Aladin 8</span>
+            <span class="message-recent">text of the last message</span> 
+          </div>
+
+          <div> 
+            <span class="profile-name-recent date-recent">4:20</span>
+
+            <div class="unread-circle">
+              <span>9+</span>
+            </div>
+          </div>
+        </div>
+        <div class='line line2'></div>
+
+
+
+    
+
+    
+        <div style='height:65vh;'></div>
+      </div>
+  
+  
+  
+  
+    </div>
+
+
+
+    
+
+
+
+
+
+    <div class="chat-container">
+
+      <div class='chat-messages scroller'>
+
+        <div class='chat-date'>20 september</div>
+
+        <div class='text-bubble  from-them'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever sianmore.
+        </div>
+        <div class='text-bubble from-them'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever sianmore.
+        </div>
+        <div class='text-bubble from-them'>
+          Lorem Ipsum is simply
+        </div>
+
+        <div class='text-bubble from-me'>
+          Lorem Ipsum is simply
+        </div>
+        <div class='text-bubble from-me'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+        </div>
+
+        <div class='text-bubble from-them'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever sianmore.
+        </div>
+
+        <div class='chat-date'>24 september</div>
+
+        <div class='text-bubble from-them'>
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </div>
+
+        <div class='text-bubble from-me'>
+          There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.        </div>
+
+
+      </div>
+
+
+      <div class='messages-input'>
+        <div class='line line-input'></div>
+
+        <div class="input-plusfile"> <span>+</span> </div>
+
+        <input type="text" placeholder="Type a Message..." autocomplete="off" class='type-message'>
+
+        <img src="{%  static 'sendarrow.svg' %}"  class="sendarrow"  draggable="false">
+      </div>
+   
+
+    </div>
+
+
+  </body>
+</html>

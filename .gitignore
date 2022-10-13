@@ -1,0 +1,7 @@
+**/**.pyc
+
+__pycache__
+db.sqlite3
+.vscode
+media/profile-pics/*
+!/media/profile-pics/default.jpg

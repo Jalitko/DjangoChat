@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    {% load static %}
+    <title>DjangoChat</title>
+    <link rel="shortcut icon" href="{%  static 'icon.svg' %}">
+    <link rel="stylesheet" href="{%  static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  </head>
+  <body>
+    <input type="hidden" id="chat-id" value="{{ id }}">
+    <input type="hidden" id="my-id" value="{{ user.id }}">
+
+    <div class='profile-picture-div main-profile'>
+      <span class="online-dot"></span>
+      <img class="profile-picture" src="media/{{ settings.profile_image }}" />
+    </div>
+      <span class="messages">Messages</span>
+    
+    <div class='profile-picture-div active' style="display: none;">
+      <span class="online-dot"></span>
+      <img class="profile-picture active-profile" src="/media/profile-pics/default.jpg" />
+    </div>
+      <span class="active-name"></span>
+    
+
+
+    <div class="chats-container">
+
+      <img src="{%  static 'arrow.svg' %}" id="slideLeft"  class="arrow arrow-left"  draggable="false" onclick='Hscroll("left")'>
+      <img src="{%  static 'arrow.svg' %}" id="slideRight" class="arrow arrow-right" draggable="false" onclick='Hscroll("right")'>
+
+      <div class='online-users' id='online-users-bar'>
+
+
+      
+      {% comment %} ONLINE USERS {% endcomment %}
+      
+      
+      </div>
+      <div class='line line1'></div>
+
+
+
+
+
+      <div class='recents scroller'>
+
+        <div id='recents'>
+          
+          {% comment %} RECENT CHATS {% endcomment %}
+
+        </div>
+    
+
+    
+        
+        
+        <div style='height:65vh;'></div>
+      </div>
+  
+  
+  
+  
+    </div>
+
+
+
+    
+
+
+
+
+
+    <div class="chat-container">
+
+      <div class='chat-messages scroller' id='chat-messages'>
+
+        {% comment %} MESSAGES {% endcomment %}
+
+
+      </div>
+
+
+      <div class='messages-input'>
+        <div class='line line-input'></div>
+
+        <div class="input-plusfile"> <span>+</span> </div>
+
+        <form id='message-form'>
+          {% csrf_token %}
+          <input type="text" placeholder="Type a Message..." autocomplete="off" class='type-message' id='message'>
+
+          <input type='image' src="{%  static 'sendarrow.svg' %}" class="sendarrow" draggable="false"/>
+        </form>
+
+      </div>
+   
+
+    </div>
+
+    
+  </body>
+  <script src="{%  static 'js/main.js' %}"></script>
+</html>
