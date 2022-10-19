@@ -431,6 +431,35 @@ a, a:link{
         align-self: flex-end;
 }
 
+[data-title]:hover:after {
+    opacity: 1;
+    transition: all 0.5s ease 0.2s;
+    visibility: visible;
+    top: -1.8em;
+}
+[data-title]:after {
+    content: attr(data-title);
+    background-color: #172F4D;
+    color: #111;
+    font-size: 15px;
+    color: #FFFFFF;
+    position: absolute;
+    padding: 2px 7px 3px 7px;
+    top: -1.5em;
+    left: 50%;
+    transform: translate(-50%, 0);
+    white-space: nowrap;
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+    border-radius: 1em;
+}
+[data-title] {
+    position: relative;
+}
+
+
+
 .line-input{
     margin: 0 15px 0 0;
     top: 0;

@@ -1,24 +1,18 @@
 #   python manage.py runserver 0.0.0.0:8000
-#   python manage.py migrate --run-syncdb 
+#   python manage.py migrate --run-syncdb
 
+from concurrent.futures import thread
+from rich.console import Console
+console = Console(style='bold green')
 import re, json
-from xmlrpc.client import Boolean
 from django.shortcuts import render, redirect
-from .models import UserSetting
+from .models import Message, UserSetting, Thread
+from .managers import ThreadManager
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-
-def log(*args, **kwargs):
-    WARNING = f'\033[94m\033[1m{args[0]}'
-    ENDC = '\033[0m'
-    args = list(args)
-    args.pop(0)
-    args = tuple(args)
-    args = (WARNING, *args, ENDC)
-    print(*args, **kwargs)
 
 def email_valid(email):
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
@@ -50,6 +44,26 @@ def api_online_users(request, id=0):
 
     return HttpResponse(
         json.dumps(users_json),
+        content_type = 'application/javascript; charset=utf8'
+    )
+
+@login_required
+def api_chat_messages(request, id):
+    messages_json = {}
+    
+    thread_name =  ThreadManager.get_pair('self', request.user.id, id)
+    thread = Thread.objects.get(name=thread_name)
+    messages = Message.objects.filter(thread=thread)
+    
+    for message in messages:
+        messages_json[message.id] = {
+            'sender': message.sender.id,
+            'text': message.text,
+            'timestamp': message.created_at.isoformat(),
+        }
+
+    return HttpResponse(
+        json.dumps(messages_json),
         content_type = 'application/javascript; charset=utf8'
     )
 

@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('online-users/', chat_views.api_online_users, name='online-users'),
     path('online-users/<int:id>', chat_views.api_online_users, name='online-users'),
+    
+    path('chat-messages/<int:id>', chat_views.api_chat_messages, name='chat_messages'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

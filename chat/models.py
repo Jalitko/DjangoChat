@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 from chat.managers import ThreadManager
 from django.db import models
 from django.contrib.auth.models import User
@@ -42,11 +43,11 @@ class Thread(TrackingModel):
 
 
 
-class Message(models.Model):
-    id = models.AutoField(primary_key=True)
-    form = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_from')
-    to   = models.ForeignKey(User, on_delete=models.CASCADE, related_name='message_to')
-    message = models.TextField()
+class Message(TrackingModel):
+    thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
+    sender = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    text = models.TextField(blank=False, null=False)
+    
     
     def __str__(self):
-        return str(self.id)
+        return f'From Thread - {self.thread.name}'

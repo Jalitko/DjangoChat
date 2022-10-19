@@ -3,4 +3,15 @@ from .models import Message, Thread, UserSetting
 
 # Register your models here.
 admin.site.register(UserSetting)
-admin.site.register(Thread)
+
+
+class MessageInline(admin.StackedInline):
+    model = Message
+    fields = ('sender', 'text')
+    readonly_fields = ('sender', 'text')
+
+class ThreadAdmin(admin.ModelAdmin):
+    model = Thread
+    inlines = (MessageInline,)
+
+admin.site.register(Thread, ThreadAdmin)
