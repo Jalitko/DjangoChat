@@ -7,8 +7,6 @@ from django.db.models import Count
 class ThreadManager(models.Manager):
     def get_or_create_thread(self, user1, user2) :
         
-        # print(f"{'*'*80}  {user1, user2}")       
-
         pair = self.get_pair(user1.id, user2.id)
 
         threads = self.get_queryset().filter(name=pair)

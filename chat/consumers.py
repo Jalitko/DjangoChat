@@ -1,59 +1,54 @@
-from channels.consumer import SyncConsumer
-from asgiref.sync import async_to_sync
+from channels.consumer import SyncConsumer, AsyncConsumer
+from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 from django.contrib.auth.models import User
-from chat.models import Message, Thread
+from chat.models import Message, Thread, UserSetting
 import json
 from rich.console import Console
 console = Console(style='bold green')
 
 
-class ChatConsumer(SyncConsumer):
-    def websocket_connect(self, event):
+class ChatConsumer(AsyncConsumer):
+    async def websocket_connect(self, event):
         me = self.scope['user']
         them = self.scope['url_route']['kwargs']['id']
-        them_user = User.objects.get(id=them)
-        self.thread = Thread.objects.get_or_create_thread(me, them_user)
+        them_user = await sync_to_async(User.objects.get)(id=them)
+        self.thread = await sync_to_async(Thread.objects.get_or_create_thread)(me, them_user)
         self.room_name = f'{self.thread.name}'
-        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
-        self.send({
+        await self.channel_layer.group_add(self.room_name, self.channel_name)
+        await self.send({
             'type': 'websocket.accept',
         })
 
         console.print(f'[{self.channel_name}] - You are connected')
 
-    def websocket_receive(self, event):
+    async def websocket_receive(self, event):
         console.print(f'[{self.channel_name}] - Received message: {event["text"]}')
 
-        msg = json.dumps({
-            'text': event.get('text'),
-            'user': self.scope['user'].id
-        })
+        await self.store_message(event.get('text'))
 
-        self.store_message(event.get('text'))
-
-        async_to_sync(self.channel_layer.group_send)(
+        await self.channel_layer.group_send(
             self.room_name,
             {
                 'type': 'websocket.message',
-                'text': msg,
             },
         )
     
-    def websocket_message(self, event):
+    async def websocket_message(self, event):
         console.print(f'[{self.channel_name}] - Message send: {event["text"]}')
 
-        self.send({
+        await self.send({
             'type': 'websocket.send',
-            'text': event.get('text'),
         })
 
 
-    def websocket_disconnect(self, event):
+    async def websocket_disconnect(self, event):
         console.print(f'[{self.channel_name}] - Disconnected')
 
-        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
+        await self.channel_layer.group_discard(self.room_name, self.channel_name)
 
 
+    @database_sync_to_async
     def store_message(self, text):
         Message.objects.create(
             thread = self.thread,
@@ -63,36 +58,56 @@ class ChatConsumer(SyncConsumer):
 
 
 
-class EchoConsumer(SyncConsumer):
-    def websocket_connect(self, event):
-        self.room_name = 'broadcast'
-        self.send({
+class OnlineConsumer(AsyncConsumer):
+    async def websocket_connect(self, event):
+        self.room_name = 'online-users'
+        await self.send({
             'type': 'websocket.accept',
         })
-        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
-        console.print(f'[{self.channel_name}] - You are connected')
+        await self.channel_layer.group_add(self.room_name, self.channel_name)
+        
+        self.me = self.scope['user']
+        console.print(f'[{self.me}] - ONLINE {self.scope["user"].id}')
 
-    def websocket_receive(self, event):
-        console.print(f'[{self.channel_name}] - Received message: {event["text"]}')
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_name,
-            {
-                'type': 'websocket.message',
-                'text': event.get('text'),
-            },
-        )
+    async def websocket_receive(self, event):
+        user = self.scope['user']
+
+        await self.send_msg(user, event.get('text'))
+        await self.store_is_online(user, True)
+
     
-    def websocket_message(self, event):
-        console.print(f'[{self.channel_name}] - Message send: {event["text"]}')
-
-        self.send({
+    async def websocket_message(self, event):
+        await self.send({
             'type': 'websocket.send',
             'text': event.get('text'),
         })
 
+    async def websocket_disconnect(self, event):
+        user = self.scope['user']
+        console.print(f'[{self.me}] - OFFLINE {user.id}')
 
-    def websocket_disconnect(self, event):
-        console.print(f'[{self.channel_name}] - Disconnected')
+        await self.send_msg(user, 'false')
+        await self.store_is_online(user, False)
 
-        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
+        await self.channel_layer.group_discard(self.room_name, self.channel_name)
+
+    async def send_msg(self, user, text):
+        msg = json.dumps({
+            'set': text,
+            'user': user.id
+        })
+
+        console.print(f'Online dot {msg}')
+
+        await self.channel_layer.group_send(
+            self.room_name,
+            {
+                'type': 'websocket.message',
+                'text': msg,
+            },
+        )
     
+    async def store_is_online(self, user, value):
+        settings = await sync_to_async(UserSetting.objects.get)(id=user.id)
+        settings.is_online = value
+        await sync_to_async(settings.save)()

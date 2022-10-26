@@ -9,6 +9,7 @@
     --Text: #9FA5B0;
     --Them-Bubble: #D9D9D9;
     --Online-Dot: #38E081;
+    --Offline-Dot: #ed4245;
 }
 
 body{
@@ -213,10 +214,14 @@ a, a:link{
     height: 15px;
     border-radius: 50%;
     
-    background: var(--Online-Dot);
     z-index: 7;
 }
-
+.online-dot.offline{
+    background: var(--Offline-Dot);
+}
+.online-dot.online{
+    background: var(--Online-Dot);
+}
 
 .online-users{
     position: relative;
@@ -433,7 +438,7 @@ a, a:link{
 
 [data-title]:hover:after {
     opacity: 1;
-    transition: all 0.5s ease 0.2s;
+    transition: all 0.5s ease 0.5s;
     visibility: visible;
     top: -1.8em;
 }

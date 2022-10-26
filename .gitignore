@@ -5,3 +5,5 @@ db.sqlite3
 .vscode
 media/profile-pics/*
 !/media/profile-pics/default.jpg
+.venv
+.python-version

@@ -54,9 +54,12 @@ function selectchat(id){
         $('.active').show()
         $('.active-name').show()
         $('#chat-id').val(id)
+        $('.active > span').attr('id', `userid-${id}`)
+        OnlineDot(($(`span[id="userid-${id}"]`)[1].classList[1] == 'online') ? true : false, id)
     });
+    
 
-    SocketCreate()
+    SocketCreateChat()
     getMessages()
 }
 
@@ -67,7 +70,7 @@ function add_Online_users(){
             document.getElementById('online-users-bar').innerHTML += `
                 <div class='online-user' onclick='selectchat("${data[key]['id']}")'>
                     <div class='profile-picture-div'>
-                        <span class="online-dot"></span>
+                        <span class="online-dot offline" id="userid-${data[key]['id']}"></span>
                         <img class="profile-picture profile-inchats" src="${data[key]['profile-image']}"/>
                     </div>
                         <span class="profile-name">${data[key]['username']}</span>
@@ -85,7 +88,7 @@ function add_Recent_chats(){
                 <div class='recent' onclick='selectchat("${data[key]['id']}")'>
 
                     <div class='profile-picture-div'>
-                        <span class="online-dot"></span>
+                        <span class="online-dot offline" id="userid-${data[key]['id']}"></span>
                         <img class="profile-picture profile-inchats" src="${data[key]['profile-image']}"/>
                     </div>
                 
@@ -109,8 +112,8 @@ function add_Recent_chats(){
  
 }
 
-// Create WebSocket connection
-function SocketCreate(){
+// Create WebSocket connection for chat
+function SocketCreateChat(){
     if(ws != 0) ws.close()
     var url = 'ws://' + window.location.host + '/ws/chat'
     ws = new WebSocket(url + window.location.pathname)
@@ -120,7 +123,6 @@ function SocketCreate(){
     }
 
     ws.onmessage = function(event){
-        var data = JSON.parse(event.data)
         getMessages(true)
     }
 
@@ -131,6 +133,59 @@ function SocketCreate(){
     ws.onerror = function(event){
         console.log('Something went wrong');
     }
+}
+
+// Create WebSocket connection for online users handling
+function SocketCreateOnline(){
+    var url = 'ws://' + window.location.host + '/ws/online'
+    on = new WebSocket(url)
+    const id = $('#my-id').val()
+
+    on.onopen = function(event){
+        console.log('ONLINE');
+        OnlineDot(true, id)
+        on.send(`true`)
+    }
+
+    on.onmessage = function(event){
+        var data = JSON.parse(event.data);
+        OnlineDot(data.set, data.user)
+    }
+
+    on.onclose = function(event){
+        console.log('OFFLINE');
+        OnlineDot(false, id)
+    }
+
+    on.onerror = function(event){
+        console.log('Something went wrong');
+    }
+}
+
+// Set online dot color by id
+function OnlineDot(setOnline, id){
+    var user = `span[id="userid-${id}"]`
+    var onClass = 'online'
+    var offClass = 'offline'
+    
+    if(setOnline == true || setOnline == 'true'){
+        $(user).removeClass(offClass).addClass(onClass)
+    }
+    else{
+        $(user).removeClass(onClass).addClass(offClass)
+    }
+}
+
+// Get all user online status
+function all_online_dot(){
+    $.getJSON('/online-users/', function(data) {
+        Object.keys(data).forEach(key => {
+            var id = data[key]['id']
+            var online = data[key]['is-online']
+            OnlineDot(online, id)
+        });
+    });
+ 
 }
 
 // Get messages from rest api
@@ -215,3 +270,7 @@ add_Recent_chats()
 add_Online_users()
 resetCurrent()
 selectchat(0)
+
+var on = 0
+SocketCreateOnline()
+all_online_dot()

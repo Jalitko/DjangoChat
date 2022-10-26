@@ -26,26 +26,25 @@ def api_online_users(request, id=0):
     if id != 0:
         user = User.objects.get(id=id)
         user_settings = UserSetting.objects.get(user=user)
-        users_json['user'] = {
-            'id': user.id,
-            'username': user_settings.username,
-            'profile-image': user_settings.profile_image.url
-        }
+        users_json['user'] = get_dictionary(user, user_settings)
 
     else:
         all_users = User.objects.all().exclude(username=request.user)
         for user in all_users:
             user_settings = UserSetting.objects.get(user=user)
-            users_json[user.id] = {
-                'id': user.id,
-                'username': user_settings.username,
-                'profile-image': user_settings.profile_image.url
-            }
+            users_json[user.id] = get_dictionary(user, user_settings)
 
     return HttpResponse(
         json.dumps(users_json),
         content_type = 'application/javascript; charset=utf8'
     )
+def get_dictionary(user, user_settings):
+    return  {
+                'id': user.id,
+                'username': user_settings.username,
+                'profile-image': user_settings.profile_image.url,
+                'is-online': user_settings.is_online
+            }
 
 @login_required
 def api_chat_messages(request, id):

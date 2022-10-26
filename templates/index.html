@@ -12,14 +12,16 @@
     <input type="hidden" id="chat-id" value="{{ id }}">
     <input type="hidden" id="my-id" value="{{ user.id }}">
 
+    {% comment %} MAIN ACCOUNT {% endcomment %}
     <div class='profile-picture-div main-profile'>
-      <span class="online-dot"></span>
+      <span class="online-dot offline" id="userid-{{ user.id }}"></span>
       <img class="profile-picture" src="media/{{ settings.profile_image }}" />
     </div>
       <span class="messages">Messages</span>
     
+    {% comment %} CHSTTING USER {% endcomment %}
     <div class='profile-picture-div active' style="display: none;">
-      <span class="online-dot"></span>
+      <span class="online-dot offline" id="userid-*"></span>
       <img class="profile-picture active-profile" src="/media/profile-pics/default.jpg" />
     </div>
       <span class="active-name"></span>
@@ -91,7 +93,6 @@
         <form id='message-form'>
           {% csrf_token %}
           <input type="text" placeholder="Type a Message..." autocomplete="off" class='type-message' id='message'>
-
           <input type='image' src="{%  static 'sendarrow.svg' %}" class="sendarrow" draggable="false"/>
         </form>
 
