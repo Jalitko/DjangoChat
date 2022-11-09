@@ -177,7 +177,7 @@ a, a:link{
     bottom: 0;
     right: 0;
     z-index: -1;
-    padding: 0px 0px 0px 25.2%;
+    padding: 0px 0px 0px 0px;
     box-sizing: border-box;
 }
 
@@ -338,7 +338,7 @@ a, a:link{
     margin-left: 5px;
 }
 .recent-box{
-    width:85%;
+    width:calc(100% - 175px);
 }
 .profile-name-recent{
     font-size: 20px;
@@ -364,6 +364,8 @@ a, a:link{
 .date-recent{
     color: var(--Text);
     margin-right: 5px;
+    margin-left: 0px;
+    text-align: end;
 }
 
 .unread-circle{
@@ -391,13 +393,15 @@ a, a:link{
     flex-direction: column;
     box-sizing: border-box;
     overflow-y: scroll;
+    overflow-x: hidden;
     height: calc(100% - 60px);
     padding-right: 15px;
     padding-top: 10px;
+    padding-left: 30.5%;
     flex-direction: column-reverse;
 }
 .messages-input{
-    width: 100%;
+    padding-left: 30.5%;
     z-index: 4;
 }
 
@@ -420,6 +424,7 @@ a, a:link{
     box-sizing: border-box;
     margin-bottom: 10px;
     max-width: 60%;
+    min-width: 10px;
     display:flex;
     box-sizing: content-box;
     padding: 15px;
@@ -444,7 +449,7 @@ a, a:link{
 }
 [data-title]:after {
     content: attr(data-title);
-    background-color: #172F4D;
+    background-color: var(--Yankees-Blue);
     color: #111;
     font-size: 15px;
     color: #FFFFFF;

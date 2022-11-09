@@ -48,24 +48,24 @@ function selectchat(id){
     window.history.pushState('data', 'title', id);
 
     //  Select chat
-    $.getJSON(`/online-users/${id}`, function(data) {
+    $('#chat-id').val(id)
+    getOnlineUsers(id, data => {
         $(".active-profile").attr('src', data['user']['profile-image']);
         $(".active-name").text(data['user']['username']);
         $('.active').show()
         $('.active-name').show()
-        $('#chat-id').val(id)
         $('.active > span').attr('id', `userid-${id}`)
         OnlineDot(($(`span[id="userid-${id}"]`)[1].classList[1] == 'online') ? true : false, id)
     });
     
 
     SocketCreateChat()
-    getMessages()
+    getChatMessages(true)
 }
 
 // Push users to online users list
 function add_Online_users(){
-   $.getJSON('/online-users/', function(data) {
+    getOnlineUsers('', data => {
         Object.keys(data).forEach(key => {
             document.getElementById('online-users-bar').innerHTML += `
                 <div class='online-user' onclick='selectchat("${data[key]['id']}")'>
@@ -80,36 +80,38 @@ function add_Online_users(){
 
 }
 
-// Push recetn Chats
+// Push recent Chats
 function add_Recent_chats(){
-    $.getJSON('/online-users/', function(data) {
-         Object.keys(data).forEach(key => {
-             document.getElementById('recents').innerHTML += `
-                <div class='recent' onclick='selectchat("${data[key]['id']}")'>
+    getOnlineUsers('', data => {
+        Object.keys(data).forEach(key => {
+            const id = data[key]['id']
+            document.getElementById('recents').innerHTML += `
+            <div class='recent' id='recentid-${id}' onclick='selectchat("${data[key]['id']}")'>
 
-                    <div class='profile-picture-div'>
-                        <span class="online-dot offline" id="userid-${data[key]['id']}"></span>
-                        <img class="profile-picture profile-inchats" src="${data[key]['profile-image']}"/>
-                    </div>
-                
+                <div class='profile-picture-div'>
+                    <span class="online-dot offline" id="userid-${id}"></span>
+                    <img class="profile-picture profile-inchats" src="${data[key]['profile-image']}"/>
+                </div>
+            
                 <div class='recent-box'> 
-                <span class="profile-name-recent">${data[key]['username']}</span>
-                <span class="message-recent">text of the last message</span> 
+                    <span class="profile-name-recent">${data[key]['username']}</span>
+                    <span class="message-recent"></span> 
                 </div>
     
-                <div> 
-                <span class="profile-name-recent date-recent">7:27</span>
-    
-                <div class="unread-circle">
-                    <span>5</span>
-                </div>
+                <div style='width:120px;'> 
+                    <span class="profile-name-recent date-recent"></span>
+        
+                    <div class="unread-circle" style="display: none;">
+                        <span>5</span>
+                    </div>
                 </div>
             </div>
             <div class='line line2'></div>
             `
-         });
-     });
- 
+            allUsers.push(id)
+            getLastMessage(id)
+        });
+    });
 }
 
 // Create WebSocket connection for chat
@@ -123,7 +125,7 @@ function SocketCreateChat(){
     }
 
     ws.onmessage = function(event){
-        getMessages(true)
+        getChatMessages()
     }
 
     ws.onclose = function(event){
@@ -162,6 +164,32 @@ function SocketCreateOnline(){
     }
 }
 
+// Create WebSocket connection for recieving messages
+function SocketNotifi(){
+    var url = 'ws://' + window.location.host + '/ws/notifi'
+    notifiWS = new WebSocket(url)
+
+    notifiWS.onopen = function(event){
+        console.log('notifi online');
+    }
+
+    notifiWS.onmessage = function(event){
+        getLastMessage(event.data)
+        notifi.pause()
+        notifi.currentTime = 0
+        notifi.play();
+        
+    }
+
+    notifiWS.onclose = function(event){
+        console.log('notifi offline');
+    }
+
+    notifiWS.onerror = function(event){
+        console.log('Something went wrong');
+    }
+}
+
 // Set online dot color by id
 function OnlineDot(setOnline, id){
     var user = `span[id="userid-${id}"]`
@@ -177,8 +205,8 @@ function OnlineDot(setOnline, id){
 }
 
 // Get all user online status
-function all_online_dot(){
-    $.getJSON('/online-users/', function(data) {
+function getAllOnlineStatus(){
+    getOnlineUsers('', data => {
         Object.keys(data).forEach(key => {
             var id = data[key]['id']
             var online = data[key]['is-online']
@@ -188,21 +216,66 @@ function all_online_dot(){
  
 }
 
-// Get messages from rest api
-function getMessages(last = false){
-    resetCurrent()
+// Get onilne users from rest api
+function getOnlineUsers(id, callback){
+    $.getJSON(`/online-users/${id}`, callback);
+}
 
+// Get messages from rest api
+function getMessages(id, count, callback){
+    $.getJSON(`/chat-messages/${id}?${count}`, callback);
+}
+
+// Get messages to chat
+function getChatMessages(all = false) {
     id = $('#chat-id').val()
-    $.getJSON(`/chat-messages/${id}`, function(data) {
+    var count = 'count=1'
+    if(all){
+        count = ''
+        resetCurrent()
         clearMessages()
+    }
+
+    getMessages(id, count, data =>{
         Object.keys(data).forEach(key => {
             var date = new Date(data[key]['timestamp'])
             recieveMessages(data[key]['sender'], data[key]['text'], date)
-            
-            if(last) return
         });
     });
 }
+
+// Get last message to recent chats
+function getLastMessage(id){
+
+    getMessages(id,'count=1', data =>{
+        var key = Object.keys(data)[0]
+        var data = data[key]
+        var time = new Date(data['timestamp'])
+        var now = new Date(Date.now())
+        var timeStr
+
+        //Not this year
+        if(time.getFullYear() != now.getFullYear()){
+            timeStr = time.toLocaleDateString()
+        }
+        //Not today
+        else if(time.getDate() != now.getDate() || time.getMonth() != now.getMonth()){
+            var day = time.getDate()
+            var month = time.toLocaleString('default', { month: 'long' }).slice(0, 3).toLowerCase()
+            timeStr = `${day} ${month}`
+        }
+        else{
+            timeStr = time.toLocaleTimeString(['en-US'], {timeStyle: 'short'}).toLowerCase()
+        }
+
+        var from = ''
+        if(id != data.sender) from = 'You:'
+
+        $(`#recentid-${id} > div > span.message-recent`).html(`${from} ${data.text}`)
+        $(`#recentid-${id} > div > span.date-recent`).html(`${timeStr}`)
+    })
+}
+
 
 // Push messages to chat thread
 function recieveMessages(senderId, text, Date){
@@ -251,7 +324,8 @@ function resetCurrent(){
 
 // Send message from input field
 function sendMessaage(e){
-    message = document.getElementById('message').value
+    message = document.getElementById('message').value.trim()
+
     
     if (e.preventDefault) e.preventDefault()
     if(message=='') return 0
@@ -263,6 +337,7 @@ function sendMessaage(e){
 
 var ws = 0
 var currentDate, currentMonth, currentYear
+var allUsers = []
 
 const messageForm = document.getElementById('message-form')
 messageForm.addEventListener('submit', sendMessaage)
@@ -273,4 +348,8 @@ selectchat(0)
 
 var on = 0
 SocketCreateOnline()
-all_online_dot()
+getAllOnlineStatus()
+
+var notifiWS = 0
+var notifi = new Audio('/static/notifi.mp3')
+SocketNotifi()

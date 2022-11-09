@@ -49,17 +49,20 @@ def get_dictionary(user, user_settings):
 @login_required
 def api_chat_messages(request, id):
     messages_json = {}
+    count = int(request.GET.get('count', 0))
     
     thread_name =  ThreadManager.get_pair('self', request.user.id, id)
     thread = Thread.objects.get(name=thread_name)
-    messages = Message.objects.filter(thread=thread)
+    messages = Message.objects.filter(thread=thread).order_by('-id')
     
-    for message in messages:
+    for i, message in enumerate(messages, start=1):
         messages_json[message.id] = {
             'sender': message.sender.id,
             'text': message.text,
             'timestamp': message.created_at.isoformat(),
         }
+        if i == count: break
+
 
     return HttpResponse(
         json.dumps(messages_json),
