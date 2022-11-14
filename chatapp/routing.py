@@ -1,14 +1,13 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.urls import path
-from chat.consumers import ChatConsumer, OnlineConsumer, NotifiConsumer
+from chat.consumers import WebConsumer
 
 application = ProtocolTypeRouter({
     'websocket':AuthMiddlewareStack(
         URLRouter([
-            path('ws/chat/<str:id>', ChatConsumer.as_asgi()),
-            path('ws/online', OnlineConsumer.as_asgi()),
-            path('ws/notifi', NotifiConsumer.as_asgi()),
+            path('ws/<str:id>', WebConsumer.as_asgi()),
+            path('ws/', WebConsumer.as_asgi()),
         ])
     )
 })

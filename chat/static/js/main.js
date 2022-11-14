@@ -59,7 +59,6 @@ function selectchat(id){
     });
     
 
-    SocketCreateChat()
     getChatMessages(true)
 }
 
@@ -114,78 +113,46 @@ function add_Recent_chats(){
     });
 }
 
-// Create WebSocket connection for chat
-function SocketCreateChat(){
-    if(ws != 0) ws.close()
-    var url = 'ws://' + window.location.host + '/ws/chat'
-    ws = new WebSocket(url + window.location.pathname)
+// Create WebSocket
+function WebSocketCreate(){
+    var loc = window.location
+    var url = 'ws://' + loc.host + '/ws' + loc.pathname
+    ws = new WebSocket(url)
 
     ws.onopen = function(event){
         console.log('Connection is opened');
+        
+        ws.send(`{
+            "type": "online",
+            "set": "true"
+        }`)
     }
 
     ws.onmessage = function(event){
-        getChatMessages()
+        var data = JSON.parse(event.data);
+        console.log(data['type'])
+        
+        if(data['type'] === 'message'){
+            getChatMessages()
+        }
+        else if(data['type'] === 'online'){
+            OnlineDot(data['set'], data['user'])
+        }
+        else if(data['type'] === 'notifi'){
+            notifi.pause()
+            notifi.currentTime = 0
+            notifi.play();
+            getLastMessage(data['user'])
+        }
     }
 
     ws.onclose = function(event){
         console.log('Connection is closed');
+        id = $('#my-id').val()
+        OnlineDot('false', id)
     }
 
     ws.onerror = function(event){
-        console.log('Something went wrong');
-    }
-}
-
-// Create WebSocket connection for online users handling
-function SocketCreateOnline(){
-    var url = 'ws://' + window.location.host + '/ws/online'
-    on = new WebSocket(url)
-    const id = $('#my-id').val()
-
-    on.onopen = function(event){
-        console.log('ONLINE');
-        OnlineDot(true, id)
-        on.send(`true`)
-    }
-
-    on.onmessage = function(event){
-        var data = JSON.parse(event.data);
-        OnlineDot(data.set, data.user)
-    }
-
-    on.onclose = function(event){
-        console.log('OFFLINE');
-        OnlineDot(false, id)
-    }
-
-    on.onerror = function(event){
-        console.log('Something went wrong');
-    }
-}
-
-// Create WebSocket connection for recieving messages
-function SocketNotifi(){
-    var url = 'ws://' + window.location.host + '/ws/notifi'
-    notifiWS = new WebSocket(url)
-
-    notifiWS.onopen = function(event){
-        console.log('notifi online');
-    }
-
-    notifiWS.onmessage = function(event){
-        getLastMessage(event.data)
-        notifi.pause()
-        notifi.currentTime = 0
-        notifi.play();
-        
-    }
-
-    notifiWS.onclose = function(event){
-        console.log('notifi offline');
-    }
-
-    notifiWS.onerror = function(event){
         console.log('Something went wrong');
     }
 }
@@ -280,10 +247,10 @@ function getLastMessage(id){
 // Push messages to chat thread
 function recieveMessages(senderId, text, Date){
     var time = Date.toLocaleTimeString(['en-US'], {timeStyle: 'short'}).toLowerCase()
-    var date = Date.toLocaleString('default', { day: 'numeric' })
+    var date = parseInt(Date.toLocaleString('default', { day: 'numeric' }))
     var month = Date.toLocaleString('default', { month: 'long' })
-    var monthInt = Date.toLocaleString('default', { month: 'numeric' })
-    var year = Date.toLocaleString('default', { year: 'numeric' })
+    var monthInt = parseInt(Date.toLocaleString('default', { month: 'numeric' }))
+    var year = parseInt(Date.toLocaleString('default', { year: 'numeric' }))
     
     // assign chat bubble to sender
     var sender = 'from-them'
@@ -303,7 +270,7 @@ function recieveMessages(senderId, text, Date){
     div_calss = 'chat-messages'
     div = `
             <div class='text-bubble ${sender}' data-title='${time}'>
-                ${text}
+                ${urlify(text)}
             </div>
             ${chatDate}
             `
@@ -325,31 +292,38 @@ function resetCurrent(){
 // Send message from input field
 function sendMessaage(e){
     message = document.getElementById('message').value.trim()
-
     
     if (e.preventDefault) e.preventDefault()
     if(message=='') return 0
     
+    id = $('#chat-id').val()
+    message = `{
+        "type": "message",
+        "to": "${id}",
+        "message": "${message}"
+    }`
     ws.send(message)
     messageForm.reset()
 }
 
+// Add clickable element to message
+function urlify(text) {
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlRegex, function(url) {
+      return `<a href="${url}" target="_blank" class="message-link">${url}</a>`
+    })
+}
 
-var ws = 0
+var ws
 var currentDate, currentMonth, currentYear
+var notifi = new Audio('/static/notifi.mp3')
 var allUsers = []
 
+WebSocketCreate()
 const messageForm = document.getElementById('message-form')
 messageForm.addEventListener('submit', sendMessaage)
 add_Recent_chats()
 add_Online_users()
 resetCurrent()
 selectchat(0)
-
-var on = 0
-SocketCreateOnline()
 getAllOnlineStatus()
-
-var notifiWS = 0
-var notifi = new Audio('/static/notifi.mp3')
-SocketNotifi()

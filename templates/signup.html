@@ -21,13 +21,13 @@
         <form class='loginForm' name="SignForm" method="post" style='margin-top: 0px;'>
           {% csrf_token %}
           <label for="email">Email</label>
-          <input type="text" placeholder="Email" name="email" id="email" class='login-singup-input' autocomplete="off" maxlength="150" required="">
+          <input type="text" placeholder="Email" name="email" id="email" class='login-signup-input' autocomplete="off" maxlength="150" required="">
 
           <label for="username">Username</label>
-          <input type="text" placeholder="Username" name="username" id="username" class='login-singup-input' autocomplete="off" maxlength="32" required="">
+          <input type="text" placeholder="Username" name="username" id="username" class='login-signup-input' autocomplete="off" maxlength="32" required="">
           
           <label for="password">Password</label>
-          <input type="password" placeholder="Password" name="password" id="password" class='login-singup-input' maxlength="150" required="">
+          <input type="password" placeholder="Password" name="password" id="password" class='login-signup-input' maxlength="150" required="">
           
           <button type='button' class="showpsd" onclick='TogglePassword()' style='bottom:-190px;'><i id='toggleeye' class="fa fa-eye"></i></button>
          

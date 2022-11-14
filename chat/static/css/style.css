@@ -88,7 +88,7 @@ label{
     font-weight: 500;
 }
 
-.login-singup-input{
+.login-signup-input{
     display: block;
     height: 50px;
     width: 100%;
@@ -132,7 +132,7 @@ label{
     border: none;
 }
 
-a, a:link{
+.signup-btn{
     cursor: pointer;
     font-family: 'Circular-Medium';
     color: white;
@@ -514,4 +514,12 @@ a, a:link{
     float: right;
     margin-top: 0.75em;
     margin-right: 15px;
+}
+
+.message-link{
+    display: contents;
+    color: white;
+}
+.message-link:hover{
+    color: rgb(143, 143, 143);
 }
