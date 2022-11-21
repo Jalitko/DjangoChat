@@ -60,6 +60,7 @@ def api_chat_messages(request, id):
             'sender': message.sender.id,
             'text': message.text,
             'timestamp': message.created_at.isoformat(),
+            'isread': message.isread,
         }
         if i == count: break
 
@@ -70,9 +71,39 @@ def api_chat_messages(request, id):
     )
 
 @login_required
+def api_unread(request):
+    messages_json = {}
+    
+    user = request.user
+    threads = Thread.objects.filter(users=user)
+    for i, thread in enumerate(threads):
+        if(user == thread.users.first()): 
+            sender = thread.users.last()
+            unread = thread.unread_by_1
+        else: 
+            sender = thread.users.first()
+            unread = thread.unread_by_2
+        
+        messages_json[i] = {
+            'sender': sender.id,
+            'count': unread,
+        }
+
+    return HttpResponse(
+        json.dumps(messages_json),
+        content_type = 'application/javascript; charset=utf8'
+    )
+
+@login_required
 def index(request, id=0):
     user = User.objects.get(username=request.user)
     Usettings = UserSetting.objects.get(user=user)
+
+    # user = User.objects.get(id=1)
+    # threads = Thread.objects.filter(users=user)
+    # for thread in threads:
+    #     if(user == thread.users.first()): console.print(f'{thread.name} --->', thread.unread_by_1)
+    
 
     context = {
         "settings" : Usettings,

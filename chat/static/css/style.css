@@ -523,3 +523,71 @@ label{
 .message-link:hover{
     color: rgb(143, 143, 143);
 }
+
+.toast-container{
+    position: fixed;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    top: 0;
+    right: 0;
+}
+.toast{
+    display: flex;
+    position: relative;
+    box-sizing: border-box;
+    background-color: #1a2a42;
+    overflow: hidden;
+    box-shadow: 0px 10px 25.5px 10.5px rgba(0, 0, 0, 0.50);
+    width: 350px;
+    height: 75px;
+    border-radius: 50px 50px;
+    cursor: pointer;
+}
+.toast.hide{
+    transform: translateX(120%);
+    transition: transform 250ms ease-in-out;
+}
+.toast.show{
+    transform: translateX(0);
+    transition: transform 250ms ease-in-out;
+}
+.toast:hover{
+    background-color: #303b4c;
+}
+.toast-text{
+    flex-direction: column;
+    color: white;
+    font-family: 'Circular-Medium';
+    margin-left: 5px;
+}
+.toast-name{
+    font-size: 20px;
+    height: 20px;
+    margin-top: 7px;
+
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.toast-message{
+    font-size: 15px;
+    margin-top: 15px;
+
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.toast::before{
+    content: "";
+    position: absolute;
+    height: 4px;
+    width: calc(100% * var(--progress));
+    background-color: white;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

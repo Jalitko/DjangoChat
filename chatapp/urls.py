@@ -18,6 +18,8 @@ urlpatterns = [
     
     path('chat-messages/<int:id>', chat_views.api_chat_messages, name='chat_messages'),
 
+    path('unread/', chat_views.api_unread, name='api_unread'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

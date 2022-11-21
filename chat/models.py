@@ -34,6 +34,8 @@ class TrackingModel(models.Model):
 class Thread(TrackingModel):
     name = models.CharField(max_length=50, null=True, blank=True)
     users = models.ManyToManyField('auth.User')
+    unread_by_1 = models.PositiveIntegerField(default=0)
+    unread_by_2 = models.PositiveIntegerField(default=0)
 
     objects = ThreadManager()
 
@@ -47,6 +49,7 @@ class Message(TrackingModel):
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE)
     sender = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     text = models.TextField(blank=False, null=False)
+    isread = models.BooleanField(default=False)
     
     
     def __str__(self):

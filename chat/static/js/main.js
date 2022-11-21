@@ -32,17 +32,18 @@ function Hscroll(side){
 function selectchat(id){
     // Unselect chat
     if (id == 0) {
-        id = $('#chat-id').val()
+        id = getIds('chat')
         
         if(id == 0){
             $('.active').hide()
             $('.active-name').hide()
+            $('.messages-input').hide()
             return
         }
     }
     
     // Clear messages after repick chat
-    if (id != $('#chat-id').val())  clearMessages()
+    if (id != getIds('chat'))  clearMessages()
 
     // push id to URL
     window.history.pushState('data', 'title', id);
@@ -54,11 +55,11 @@ function selectchat(id){
         $(".active-name").text(data['user']['username']);
         $('.active').show()
         $('.active-name').show()
+        $('.messages-input').show()
         $('.active > span').attr('id', `userid-${id}`)
         OnlineDot(($(`span[id="userid-${id}"]`)[1].classList[1] == 'online') ? true : false, id)
     });
     
-
     getChatMessages(true)
 }
 
@@ -85,7 +86,7 @@ function add_Recent_chats(){
         Object.keys(data).forEach(key => {
             const id = data[key]['id']
             document.getElementById('recents').innerHTML += `
-            <div class='recent' id='recentid-${id}' onclick='selectchat("${data[key]['id']}")'>
+            <div class='recent' id='recentid-${id}' onclick='selectchat("${id}")'>
 
                 <div class='profile-picture-div'>
                     <span class="online-dot offline" id="userid-${id}"></span>
@@ -100,7 +101,7 @@ function add_Recent_chats(){
                 <div style='width:120px;'> 
                     <span class="profile-name-recent date-recent"></span>
         
-                    <div class="unread-circle" style="display: none;">
+                    <div class="unread-circle" id="badge-${id}" style="display: none;">
                         <span>5</span>
                     </div>
                 </div>
@@ -129,6 +130,8 @@ function WebSocketCreate(){
     }
 
     ws.onmessage = function(event){
+        unread()
+
         var data = JSON.parse(event.data);
         console.log(data['type'])
         
@@ -139,16 +142,21 @@ function WebSocketCreate(){
             OnlineDot(data['set'], data['user'])
         }
         else if(data['type'] === 'notifi'){
-            notifi.pause()
-            notifi.currentTime = 0
-            notifi.play();
+            var id = data['sender']
+
+            if(id != parseInt(getIds('my'))){
+                notifi.pause()
+                notifi.currentTime = 0
+                notifi.play();
+                new Toast(id)
+            }
             getLastMessage(data['user'])
         }
     }
 
     ws.onclose = function(event){
         console.log('Connection is closed');
-        id = $('#my-id').val()
+        id = getIds('my')
         OnlineDot('false', id)
     }
 
@@ -195,7 +203,9 @@ function getMessages(id, count, callback){
 
 // Get messages to chat
 function getChatMessages(all = false) {
-    id = $('#chat-id').val()
+    id = getIds('chat')
+    if(id==0) return
+
     var count = 'count=1'
     if(all){
         count = ''
@@ -203,12 +213,30 @@ function getChatMessages(all = false) {
         clearMessages()
     }
 
-    getMessages(id, count, data =>{
-        Object.keys(data).forEach(key => {
-            var date = new Date(data[key]['timestamp'])
-            recieveMessages(data[key]['sender'], data[key]['text'], date)
-        });
-    });
+    var open = setInterval(() => {
+        if(ws.readyState === WebSocket.OPEN){
+            getMessages(id, count, data =>{
+                Object.keys(data).forEach(key => {
+                    var date = new Date(data[key]['timestamp'])
+                    recieveMessages(data[key]['sender'], data[key]['text'], date)
+
+                    if(getIds('chat') == data[key]['sender']){
+                        if(data[key]['isread']) return
+                        ws.send(`{
+                            "type": "read",
+                            "id": "${key}",
+                            "user": "${getIds('chat')}"
+                        }`)
+                    }
+                })
+            })
+            clearInterval(open)
+        }
+    },100)
+
+    setTimeout(() =>{
+        unread()
+    }, 1000)
 }
 
 // Get last message to recent chats
@@ -254,7 +282,7 @@ function recieveMessages(senderId, text, Date){
     
     // assign chat bubble to sender
     var sender = 'from-them'
-    if(senderId == $('#my-id').val()) sender = 'from-me'
+    if(senderId == getIds('my')) sender = 'from-me'
     
 
     // Pust date separator
@@ -296,10 +324,9 @@ function sendMessaage(e){
     if (e.preventDefault) e.preventDefault()
     if(message=='') return 0
     
-    id = $('#chat-id').val()
     message = `{
         "type": "message",
-        "to": "${id}",
+        "to": "${getIds('chat')}",
         "message": "${message}"
     }`
     ws.send(message)
@@ -312,6 +339,137 @@ function urlify(text) {
     return text.replace(urlRegex, function(url) {
       return `<a href="${url}" target="_blank" class="message-link">${url}</a>`
     })
+}
+
+// Get id from html 
+function getIds(id){
+    if(id === 'chat') return $('#chat-id').val()
+    else return $('#my-id').val()
+}
+
+// Create Toast to toast container
+class Toast {
+    #container
+    #toastElem
+    #delay = 3000
+    #visibleSince
+    #moveBind
+    #id
+
+    constructor(options){
+        this.#id = options
+        getOnlineUsers(options, data => {
+            var user = data['user']
+            getMessages(options, 'count=1', data =>{
+                var key = Object.keys(data)[0]
+                var message = data[key]
+
+                options = {
+                    user: options,
+                    name: user['username'],
+                    image: user['profile-image'],
+                    text: message['text'],
+                }
+                this.show(options)
+            })
+        })
+
+        this.#moveBind = this.moveToChat.bind(this)
+        this.#container = document.getElementById('toast-container')
+        this.autoClose(this.#delay)
+        this.#visibleSince = new Date()
+    }
+
+    show(options) {
+        this.#toastElem = document.createElement("div")
+        this.#toastElem.classList.add("toast", "hide")
+        this.#toastElem.addEventListener('click', this.#moveBind)
+        this.#container.append(this.#toastElem)
+
+        this.#toastElem.innerHTML += `
+            <img class="profile-picture" src="${options.image}">
+            <div class='toast-text'>
+                <div class='toast-name'>${options.name}</div>
+                <div class='toast-message'>${options.text}</div>
+            </div>
+        `
+        setTimeout(() => {
+            this.#toastElem.classList.remove('hide')
+            this.#toastElem.classList.add('show')
+        }, 20)
+
+        this.showProgress()
+    }
+
+    remove(){
+        this.hide()
+        setTimeout(() => this.#toastElem.remove(), 220)
+    }
+
+    autoClose(value){
+        setTimeout(() => this.remove(), value)
+    }
+
+    hide(){
+        this.#toastElem.classList.add('hide')
+        this.#toastElem.classList.remove('show')
+    }
+
+    showProgress(){
+        setInterval(() => {
+            const timeVisible = new Date() - this.#visibleSince
+            this.#toastElem.style.setProperty(
+                '--progress',
+                1 - timeVisible / this.#delay
+            )
+        }, 10)
+    }
+
+    moveToChat(){
+        selectchat(this.#id)
+        this.remove()
+    }
+}
+
+// Get unread messages from REST api
+function getUnread(callback){
+    $.getJSON(`/unread/`, callback);
+}
+
+// Count unread messages
+function unread(){
+    unreadOb = {total : -1, count: -1, now: 0,}
+
+    getUnread(data =>{
+        unreadOb.count = Object.keys(data).length
+        Object.keys(data).forEach(key => {
+            if(unreadOb.total == -1) unreadOb.total = 0
+            unreadOb.total += data[key]['count']
+            unreadOb.now += 1
+            badge(data[key]['sender'], data[key]['count'])
+        })
+    })
+
+    var intter = setInterval(() => {
+        if(unreadOb.count == unreadOb.now){
+            if(unreadOb.total == 0) document.title = 'DjangoChat'
+            else document.title = `DjangoChat (${unreadOb.total})`
+
+            clearInterval(intter)
+        }
+    }, 20)
+}
+
+// Get unread count to badge
+function badge(id, value){
+    if(value == 0) {
+        $(`#badge-${id}`).hide()
+    }
+    else{
+        if(value > 9) value = '9+'
+        $(`#badge-${id} > span`).text(value)
+        $(`#badge-${id}`).show()
+    }
 }
 
 var ws
@@ -327,3 +485,5 @@ add_Online_users()
 resetCurrent()
 selectchat(0)
 getAllOnlineStatus()
+var unreadOb
+unread()

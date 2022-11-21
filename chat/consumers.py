@@ -33,6 +33,14 @@ class WebConsumer(AsyncConsumer):
             msg = await self.send_online(event)
             console.print(online_users)
             await self.send_users(msg, [])
+        elif event['type'] == 'read':
+            msg = await sync_to_async(Message.objects.get)(id=event['id'])
+            msg.isread = True
+            await sync_to_async(msg.save)()
+            
+            msg_thread = await sync_to_async(Thread.objects.get)(message=msg)
+            await self.unread(msg_thread, int(event['user']), -1)
+
     
     async def websocket_message(self, event):
         await self.send(
@@ -62,6 +70,7 @@ class WebConsumer(AsyncConsumer):
         self.them_user = await sync_to_async(User.objects.get)(id=them_id)
         self.thread = await sync_to_async(Thread.objects.get_or_create_thread)(self.me, self.them_user)
         await self.store_message(msg['message'])
+        await self.unread(self.thread, self.me.id, 1)
 
         await self.send_notifi([self.me.id, self.them_user.id])
         return json.dumps({
@@ -112,7 +121,8 @@ class WebConsumer(AsyncConsumer):
         for i in range(len(users)):
             text = json.dumps({
                 'type': 'notifi',
-                'user': users[i-1]
+                'user': users[i-1],
+                'sender': users[0]
             })
 
             await self.channel_layer.group_send(
@@ -122,3 +132,13 @@ class WebConsumer(AsyncConsumer):
                     'text': text,
                 },
             )
+
+    async def unread(self, thread, user, plus):
+        users = await sync_to_async(thread.users.first)()
+        
+        if(users.id != int(user)): 
+            thread.unread_by_1 += plus
+        else: 
+            thread.unread_by_2 += plus
+        
+        await sync_to_async(thread.save)()
