@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%3!necin$ajp+$svkm!vumv&jpe9wqbu_d%(f!ljb-n^74^8(u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '192.168.101.46', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -138,7 +138,7 @@ LOGIN_URL = 'login_view'
 
 
 #   REDIS
-REDIS = True
+REDIS = False
 
 if REDIS :
     CHANNEL_LAYERS = {
