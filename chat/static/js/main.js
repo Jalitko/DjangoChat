@@ -133,9 +133,10 @@ function WebSocketCreate(){
         unread()
 
         var data = JSON.parse(event.data);
-        console.log(data['type'])
+        console.log(data)
         
         if(data['type'] === 'message'){
+            if(data['sender'] != getIds('chat')) return
             getChatMessages()
         }
         else if(data['type'] === 'online'){

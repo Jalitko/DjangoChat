@@ -75,6 +75,7 @@ class WebConsumer(AsyncConsumer):
         await self.send_notifi([self.me.id, self.them_user.id])
         return json.dumps({
             'type': 'message',
+            'sender': them_id,
         })
 
     @database_sync_to_async
