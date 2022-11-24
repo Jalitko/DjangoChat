@@ -1,4 +1,4 @@
-![Home View](static/../chat/static/screenshots/firefox_oEAifIr1r6.png?raw=true "Title")
+![Home View](static/../chat/static/screenshots/homeview.png?raw=true "Title")
 
 # DjangoChat
 
