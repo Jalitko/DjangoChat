@@ -13,9 +13,16 @@
     <input type="hidden" id="my-id" value="{{ user.id }}">
 
     {% comment %} MAIN ACCOUNT {% endcomment %}
-    <div class='profile-picture-div main-profile'>
+    <div class='profile-picture-div main-profile' id='main-profile' onclick='settingsPopup()'>
       <span class="online-dot offline" id="userid-{{ user.id }}"></span>
       <img class="profile-picture" src="media/{{ settings.profile_image }}" />
+    </div>
+
+    <div class='user-settings-wrapper' style='display:none;'>
+      <div class='settings-element' onclick="window.location='/settings';">
+        <div class='settings-element-text' ahref='/settings'>Edit Settings</div>
+      </div>
+
     </div>
       <span class="messages">Messages</span>
     

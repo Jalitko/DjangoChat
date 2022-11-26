@@ -97,13 +97,7 @@ def api_unread(request):
 @login_required
 def index(request, id=0):
     user = User.objects.get(username=request.user)
-    Usettings = UserSetting.objects.get(user=user)
-
-    # user = User.objects.get(id=1)
-    # threads = Thread.objects.filter(users=user)
-    # for thread in threads:
-    #     if(user == thread.users.first()): console.print(f'{thread.name} --->', thread.unread_by_1)
-    
+    Usettings = UserSetting.objects.get(user=user)   
 
     context = {
         "settings" : Usettings,
@@ -165,3 +159,25 @@ def signup_view(request):
 
 
     return render(request, 'signup.html')
+
+@login_required
+def settings_view(request):
+    user = User.objects.get(username=request.user)
+    Usettings = UserSetting.objects.get(user=user)  
+
+    if request.method == 'POST':
+        try:    avatar = request.FILES["avatar"]
+        except: avatar = None
+        username = request.POST['username']
+
+        Usettings.username = username
+        if(avatar != None):
+            Usettings.profile_image.delete(save=True)
+            Usettings.profile_image = avatar
+        Usettings.save()
+
+    context = {
+        "settings" : Usettings,
+        'user' : user,
+    }
+    return render(request, 'settings.html', context=context)

@@ -133,7 +133,7 @@ function WebSocketCreate(){
         unread()
 
         var data = JSON.parse(event.data);
-        console.log(data)
+        // console.log(data)
         
         if(data['type'] === 'message'){
             if(data['sender'] != getIds('chat')) return
@@ -471,6 +471,11 @@ function badge(id, value){
         $(`#badge-${id} > span`).text(value)
         $(`#badge-${id}`).show()
     }
+}
+
+// Settings popup
+function settingsPopup(){
+    $('.user-settings-wrapper').toggle()
 }
 
 var ws

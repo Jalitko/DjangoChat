@@ -20,10 +20,10 @@
 
         <form class='loginForm' name="LoginForm" method="post">
           {% csrf_token %}
-          <label for="email">Email</label>
+          <label class='label' for="email">Email</label>
           <input type="text" placeholder="Email" name="email" id="email" class='login-signup-input' autocomplete="off" maxlength="150" required="">
           
-          <label for="password">Password</label>
+          <label class='label' for="password">Password</label>
           <input type="password" placeholder="Password" name="password" id="password" class='login-signup-input' maxlength="150" required="">
           
           <button type='button' class="showpsd" onclick='TogglePassword()'><i id='toggleeye' class="fa fa-eye"></i></button>
