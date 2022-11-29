@@ -61,6 +61,9 @@ function selectchat(id){
     });
     
     getChatMessages(true)
+    messageForm.reset()
+    isTyping.myInput = ''
+    $('.is-typing').hide()
 }
 
 // Push users to online users list
@@ -152,6 +155,11 @@ function WebSocketCreate(){
                 new Toast(id)
             }
             getLastMessage(data['user'])
+        }
+        else if(data['type'] === 'istyping'){
+            console.log(data['set'])
+            if(data['set'] == 'true') $('.is-typing').show()
+            else $('.is-typing').hide()
         }
     }
 
@@ -478,6 +486,30 @@ function settingsPopup(){
     $('.user-settings-wrapper').toggle()
 }
 
+// Chacking if user typing new message
+function isTyping(){
+    setInterval(() => {
+        var message = $('#message').val()
+        if(isTypingObj.myInput != message && message != ''){
+            isTypingObj.myInput = $('#message').val()
+            if(!isTypingObj.myState) sendIsTyping(true)
+        }
+        else{
+            if(isTypingObj.myState) sendIsTyping(false)
+        }
+    }, 500)
+}
+
+// Send to WebSocket isTyping state 
+function sendIsTyping(state){
+    isTypingObj.myState = state
+    ws.send(`{
+        "type": "istyping",
+        "set": "${state}",
+        "user": "${getIds('chat')}"
+    }`)
+}
+
 var ws
 var currentDate, currentMonth, currentYear
 var notifi = new Audio('/static/notifi.mp3')
@@ -493,3 +525,10 @@ selectchat(0)
 getAllOnlineStatus()
 var unreadOb
 unread()
+
+var isTypingObj = {
+    myInput : '',
+    myState: false,
+    senderState: false,
+}
+isTyping()

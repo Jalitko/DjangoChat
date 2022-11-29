@@ -24,7 +24,7 @@ class WebConsumer(AsyncConsumer):
 
     async def websocket_receive(self, event):
         event = json.loads(event['text'])
-        console.print(f'Received message: {event["type"]}')
+        # console.print(f'Received message: {event["type"]}')
 
         if   event['type'] == 'message':
             msg = await self.send_msg(event)
@@ -40,6 +40,9 @@ class WebConsumer(AsyncConsumer):
             
             msg_thread = await sync_to_async(Thread.objects.get)(message=msg)
             await self.unread(msg_thread, int(event['user']), -1)
+        elif event['type'] == 'istyping':
+            console.print(self.me, event)
+            await self.send_istyping(event)
 
     
     async def websocket_message(self, event):
@@ -143,3 +146,17 @@ class WebConsumer(AsyncConsumer):
             thread.unread_by_2 += plus
         
         await sync_to_async(thread.save)()
+
+    async def send_istyping(self, event):
+        text = json.dumps({
+            'type': 'istyping',
+            'set': event['set'],
+        })
+
+        await self.channel_layer.group_send(
+            str(event['user']),
+            {
+                'type': 'websocket.message',
+                'text': text,
+            },
+        )
